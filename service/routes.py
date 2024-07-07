@@ -51,15 +51,16 @@ def create_accounts():
     account.create()
     message = account.serialize()
     # Uncomment once get_accounts has been implemented
-    # location_url = url_for("get_accounts", account_id=account.id, _external=True)
-    location_url = "/"  # Remove once get_accounts has been implemented
+    # location_url = url_for("get_account", account_id=account.id, _external=True)
+    location_url = "/"  # Remove once get_account has been implemented
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
-############################################################
+
+######################################################################
 # LIST ALL ACCOUNTS
-############################################################
+######################################################################
 @app.route("/accounts", methods=["GET"])
 def list_accounts():
     """Returns all Accounts"""
@@ -117,26 +118,6 @@ def delete_account(account_id):
 ######################################################################
 # U T I L I T Y   F U N C T I O N S
 ######################################################################
-
-# Include the check_content_type function as provided in your snippet
-
-def check_content_type(media_type):
-    """Checks that the media type is correct"""
-    content_type = request.headers.get("Content-Type")
-    if content_type and content_type == media_type:
-        return
-    app.logger.error("Invalid Content-Type: %s", content_type)
-    abort(
-        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        f"Content-Type must be {media_type}",
-    )
-
-
-######################################################################
-#  U T I L I T Y   F U N C T I O N S
-######################################################################
-
-
 def check_content_type(media_type):
     """Checks that the media type is correct"""
     content_type = request.headers.get("Content-Type")
