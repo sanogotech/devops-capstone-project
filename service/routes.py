@@ -57,32 +57,79 @@ def create_accounts():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
-######################################################################
+############################################################
 # LIST ALL ACCOUNTS
-######################################################################
-
-# ... place you code here to LIST accounts ...
+############################################################
+@app.route("/accounts", methods=["GET"])
+def list_accounts():
+    """Returns all Accounts"""
+    app.logger.info("Request to list all Accounts")
+    accounts = Account.all()
+    return jsonify([account.serialize() for account in accounts]), status.HTTP_200_OK
 
 
 ######################################################################
 # READ AN ACCOUNT
 ######################################################################
-
-# ... place you code here to READ an account ...
+@app.route("/accounts/<int:account_id>", methods=["GET"])
+def get_account(account_id):
+    """Returns a single Account based on its account_id"""
+    app.logger.info("Request to read a single Account")
+    account = Account.find(account_id)
+    if not account:
+        abort(status.HTTP_404_NOT_FOUND, f"Account with id {account_id} not found")
+    return jsonify(account.serialize()), status.HTTP_200_OK
 
 
 ######################################################################
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
+@app.route("/accounts/<int:account_id>", methods=["PUT"])
+def update_account(account_id):
+    """Updates an existing Account"""
+    app.logger.info("Request to update an Account")
+    check_content_type("application/json")
+    account = Account.find(account_id)
+    if not account:
+        abort(status.HTTP_404_NOT_FOUND, f"Account with id {account_id} not found")
 
-# ... place you code here to UPDATE an account ...
+    account.deserialize(request.get_json())
+    account.update()
+
+    return jsonify(account.serialize()), status.HTTP_200_OK
 
 
 ######################################################################
 # DELETE AN ACCOUNT
 ######################################################################
+@app.route("/accounts/<int:account_id>", methods=["DELETE"])
+def delete_account(account_id):
+    """Deletes an existing Account"""
+    app.logger.info("Request to delete an Account")
+    account = Account.find(account_id)
+    if not account:
+        abort(status.HTTP_404_NOT_FOUND, f"Account with id {account_id} not found")
 
-# ... place you code here to DELETE an account ...
+    account.delete()
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
+
+######################################################################
+# U T I L I T Y   F U N C T I O N S
+######################################################################
+
+# Include the check_content_type function as provided in your snippet
+
+def check_content_type(media_type):
+    """Checks that the media type is correct"""
+    content_type = request.headers.get("Content-Type")
+    if content_type and content_type == media_type:
+        return
+    app.logger.error("Invalid Content-Type: %s", content_type)
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        f"Content-Type must be {media_type}",
+    )
 
 
 ######################################################################
